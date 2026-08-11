@@ -1,0 +1,19 @@
+name: ServerAssistant
+version: '1.0.0'
+main: me.kev.sva.ServerAssistant
+api-version: '1.21'
+description: 
+  ServerAssistant is a paper plugin that adds an AI assistant to your server. It can answer questions, provide information, and assist with various tasks. The plugin is designed to enhance the player experience by offering helpful insights and guidance.
+
+author: k3vndev
+
+commands:
+  sva reload:
+    description: Reload the plugin config
+    usage: /sva reload
+    permission: sva.reload
+
+permissions:
+  sva.reload:
+    description: Allows reloading the plugin configuration
+    default: op
