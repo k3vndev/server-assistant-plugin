@@ -13,8 +13,8 @@ import org.bukkit.util.StringUtil;
 import me.kev.sva.chat.ChatListener;
 import me.kev.sva.chat.ConversationManager;
 import me.kev.sva.constants.Constants;
+import me.kev.sva.utils.MessageSender;
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.ChatColor;
 
 public final class ServerAssistant extends JavaPlugin {
 
@@ -27,21 +27,23 @@ public final class ServerAssistant extends JavaPlugin {
         getCommand("sva").setExecutor(this);
         getCommand("sva").setTabCompleter(this);
 
-        conversationManager = new ConversationManager(this);
+        initializePlugin();
 
         getServer().getPluginManager().registerEvents(
                 new ChatListener(conversationManager),
                 this);
 
         Bukkit.getConsoleSender().sendMessage(Constants.ASCII_LOGO);
-        Bukkit.getConsoleSender().sendMessage(
-                ChatColor.BLUE + "[Server Assistant] Plugin enabled successfully.");
+        MessageSender.Success("Plugin enabled successfully.");
+    }
+
+    void initializePlugin() {
+        conversationManager = new ConversationManager(this);
     }
 
     @Override
     public void onDisable() {
-        Bukkit.getConsoleSender().sendMessage(
-                ChatColor.RED + "[Server Assistant] Plugin Disabled!");
+        MessageSender.Error("Plugin Disabled!");
     }
 
     @Override
@@ -53,14 +55,10 @@ public final class ServerAssistant extends JavaPlugin {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
 
             try {
-                getLogger().info("Attempting to reload config...");
-
                 reloadConfig();
+                initializePlugin();
 
-                getLogger().info("Config reload successful.");
-
-                sender.sendMessage(
-                        Component.text("[Server Assistant] config reloaded."));
+                MessageSender.Success("Plugin reloaded!");
 
             } catch (Exception e) {
 
@@ -72,10 +70,7 @@ public final class ServerAssistant extends JavaPlugin {
 
                 e.printStackTrace();
 
-                sender.sendMessage(
-                        Component.text(
-                                "[Server Assistant] config reload failed. "
-                                        + "Check console."));
+                MessageSender.Error("Config reload failed. Check console.");
             }
 
             return true;
