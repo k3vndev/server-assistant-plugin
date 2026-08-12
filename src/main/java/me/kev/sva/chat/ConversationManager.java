@@ -15,12 +15,27 @@ public class ConversationManager {
 
   public ConversationManager(JavaPlugin plugin) {
     this.plugin = plugin;
-    this.assistantManager = new AssistantManager(plugin);
+    this.assistantManager = new AssistantManager(plugin, this);
+  }
+
+  public void shutdown() {
+    if (batchTask != null) {
+      try {
+        batchTask.cancel();
+      } catch (Exception ignored) {
+      }
+      batchTask = null;
+    }
+
+    if (assistantManager != null) {
+      assistantManager.shutdown();
+    }
+
+    conversation.clear();
   }
 
   public void playerMessage(ChatMessage message) {
-    conversation.add(message);
-
+    addChatMessage(message);
     scheduleBatch();
   }
 
@@ -59,5 +74,9 @@ public class ConversationManager {
     int start = conversation.size() - limit;
 
     return conversation.subList(start, conversation.size());
+  }
+
+  public void addChatMessage(ChatMessage message) {
+    conversation.add(message);
   }
 }

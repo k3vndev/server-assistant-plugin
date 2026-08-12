@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
+import org.bukkit.event.HandlerList;
 
 import me.kev.sva.chat.ChatListener;
 import me.kev.sva.chat.ConversationManager;
@@ -19,6 +20,7 @@ import net.kyori.adventure.text.Component;
 public final class ServerAssistant extends JavaPlugin {
 
     private ConversationManager conversationManager;
+    private ChatListener chatListener;
 
     @Override
     public void onEnable() {
@@ -29,20 +31,53 @@ public final class ServerAssistant extends JavaPlugin {
 
         initializePlugin();
 
-        getServer().getPluginManager().registerEvents(
-                new ChatListener(conversationManager),
-                this);
-
         Bukkit.getConsoleSender().sendMessage(Constants.ASCII_LOGO);
         MessageSender.Success("Plugin enabled successfully.");
     }
 
     void initializePlugin() {
+        // If already initialized, shut down previous services and unregister listener
+        if (conversationManager != null) {
+            try {
+                conversationManager.shutdown();
+            } catch (Exception ignored) {
+            }
+            conversationManager = null;
+        }
+
+        if (chatListener != null) {
+            try {
+                HandlerList.unregisterAll(chatListener);
+            } catch (Exception ignored) {
+            }
+            chatListener = null;
+        }
+
+        // Create new conversation manager (reads updated config) and register listener
         conversationManager = new ConversationManager(this);
+        chatListener = new ChatListener(conversationManager);
+        getServer().getPluginManager().registerEvents(chatListener, this);
     }
 
     @Override
     public void onDisable() {
+        // Shutdown services and unregister listeners
+        if (conversationManager != null) {
+            try {
+                conversationManager.shutdown();
+            } catch (Exception ignored) {
+            }
+            conversationManager = null;
+        }
+
+        if (chatListener != null) {
+            try {
+                HandlerList.unregisterAll(chatListener);
+            } catch (Exception ignored) {
+            }
+            chatListener = null;
+        }
+
         MessageSender.Error("Plugin Disabled!");
     }
 

@@ -11,7 +11,7 @@ from pathlib import Path
 JAVA_HOME = r"C:\Program Files\Java\jdk-21.0.11"
 BUILD_COMMAND = rf"$env:JAVA_HOME='{JAVA_HOME}'; mvn clean package"
 PLUGINS_DIR = Path(r"D:\Minecraft Server\plugins")
-RESET_CONFIG = True
+RESET_CONFIG = False
 SERVER_ASSISTANT_CONFIG_DIR_NAME = "ServerAssistant"
 BUILD_TIMEOUT_SECONDS = 300
 POLL_INTERVAL_SECONDS = 1
