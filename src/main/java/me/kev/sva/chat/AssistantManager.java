@@ -1,7 +1,10 @@
 package me.kev.sva.chat;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +15,7 @@ import com.openai.models.chat.completions.ChatCompletionCreateParams;
 
 import me.kev.sva.utils.MessageSender;
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatColor;
 
 public class AssistantManager {
   private final JavaPlugin plugin;
@@ -36,6 +40,13 @@ public class AssistantManager {
     }
   }
 
+  /**
+   * Mark this assistant manager as shutdown so ongoing/queued work is skipped.
+   */
+  public void shutdown() {
+    shutdown = true;
+  }
+
   public void promptAIModel() {
     if (shutdown)
       return;
@@ -56,9 +67,10 @@ public class AssistantManager {
         .builder()
         .model(configuredModel);
 
-    List<ChatMessage> chatMessages = conversationManager.getTrimmedConversation();
+    appendSystemPromptsToBuilder(paramsBuilder);
 
-    appendMessagesToBuilder(paramsBuilder, chatMessages);
+    List<ChatMessage> chatMessages = conversationManager.getTrimmedConversation();
+    appendConversationMessagesToBuilder(paramsBuilder, chatMessages);
 
     ChatCompletionCreateParams params = paramsBuilder.build();
 
@@ -77,12 +89,14 @@ public class AssistantManager {
           if (text.isEmpty())
             return;
 
+          String assistantMessageText = sanitizeAssistantMessage(text);
+
           ChatMessage assistantMessage = new ChatMessage(
               plugin.getConfig().getString(
                   "assistant-name",
                   "ServerAssistant"),
               true,
-              text);
+              assistantMessageText);
 
           if (shutdown)
             return;
@@ -94,7 +108,7 @@ public class AssistantManager {
               return;
             plugin.getServer().broadcast(
                 Component.text(
-                    formatAssistantMessage(text)));
+                    formatAssistantMessage(assistantMessageText)));
           });
         })
         .exceptionally(error -> {
@@ -106,16 +120,58 @@ public class AssistantManager {
         });
   }
 
-  /**
-   * Mark this assistant manager as shutdown so ongoing/queued work is skipped.
-   */
-  public void shutdown() {
-    shutdown = true;
+  private void appendSystemPromptsToBuilder(
+      ChatCompletionCreateParams.Builder paramsBuilder) {
+
+    // Personality prompt
+    String personalityPrompt = plugin.getConfig().getString(
+        "prompt",
+        "You are ServerAssistant, an AI assistant inside a Minecraft server.");
+
+    paramsBuilder.addSystemMessage(personalityPrompt);
+
+    // Server information
+    int onlineCount = Bukkit.getOnlinePlayers().size();
+
+    String onlinePlayers = Bukkit.getOnlinePlayers().stream()
+        .map(player -> player.getName())
+        .sorted()
+        .collect(Collectors.joining(", "));
+
+    LocalDateTime now = LocalDateTime.now();
+
+    String serverContext = """
+        SERVER DATA:
+
+        Current time: %s
+        Current date: %s
+        Online players: %d
+        Player names: %s
+        """.formatted(
+        now.format(DateTimeFormatter.ofPattern("HH:mm")),
+        now.toLocalDate(),
+        onlineCount,
+        onlinePlayers.isEmpty() ? "none" : onlinePlayers);
+
+    paramsBuilder.addSystemMessage(serverContext);
+
+    // Max assistant message lenght
+    int maxAssistantMessageLength = plugin.getConfig().getInt(
+        "chat.max-assistant-message-length",
+        250);
+
+    paramsBuilder.addSystemMessage("""
+        Maximum assistant message length: %d characters
+        """.formatted(maxAssistantMessageLength));
   }
 
-  private void appendMessagesToBuilder(
+  private void appendConversationMessagesToBuilder(
       ChatCompletionCreateParams.Builder paramsBuilder,
       List<ChatMessage> chatMessages) {
+
+    int maxPlayerMessageLength = plugin.getConfig().getInt(
+        "chat.max-player-message-length",
+        250);
 
     for (ChatMessage message : chatMessages) {
       if (message.isAssistant) {
@@ -123,11 +179,45 @@ public class AssistantManager {
         continue;
       }
 
-      paramsBuilder.addUserMessage(message.senderName + ": " + message.content);
+      String content = message.content;
+
+      if (maxPlayerMessageLength > 0 && content.length() > maxPlayerMessageLength) {
+        content = content.substring(0, maxPlayerMessageLength);
+      }
+
+      paramsBuilder.addUserMessage(
+          "[" + message.senderName + "] " + content);
     }
   }
 
   private String formatAssistantMessage(String text) {
-    return "🤖 ServerAssistant: " + text;
+    String assistantName = plugin.getConfig().getString(
+        "assistant-name",
+        "ServerAssistant");
+
+    String format = plugin.getConfig().getString(
+        "chat.assistant-format",
+        "&b🤖 &b&l%assistant_name%: &r%message%");
+
+    return ChatColor.translateAlternateColorCodes(
+        '&',
+        format
+            .replace("%assistant_name%", assistantName)
+            .replace("%message%", text));
+  }
+
+  private String sanitizeAssistantMessage(String text) {
+    if (text == null || text.isEmpty()) {
+      return "";
+    }
+
+    return text.replaceAll(
+        "[\\x{1F000}-\\x{1FAFF}" +
+            "\\x{2600}-\\x{27BF}" +
+            "\\x{2300}-\\x{23FF}" +
+            "\\x{2B00}-\\x{2BFF}" +
+            "\\x{FE00}-\\x{FE0F}" +
+            "\\x{1F1E6}-\\x{1F1FF}]",
+        "");
   }
 }

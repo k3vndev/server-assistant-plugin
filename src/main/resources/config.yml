@@ -14,7 +14,7 @@ api-key: "YOUR_API_KEY_HERE"
 
 # Model used by the assistant.
 #
-# The exact model name expected by the AI provider.
+# The exact model name expected by the AI provider (Open AI).
 ai-model: "gpt-4o-mini"
 
 
@@ -29,7 +29,7 @@ ai-model: "gpt-4o-mini"
 # recent conversation, but increase token usage.
 #
 # Set to 0 to disable previous-message context.
-message-history-limit: 20
+message-history-limit: 15
 
 
 # ------------------------------------------------------------
@@ -45,27 +45,27 @@ message-history-limit: 20
 # This prevents multiple AI requests when players send several
 # messages in quick succession.
 #
-# Example with message-batch-delay: 500:
+# Example with message-batch-delay: 1000:
 #
 # Player: "hey"
 #       ↓
-#       wait 500ms
+#       wait 1000ms
 #
 # Player: "are you there?"
 #       ↓
-#       timer resets
+#       timer resets, so wait 1000ms again
 #
 # Player: "I have a question"
 #       ↓
-#       timer resets
+#       timer resets, so wait 1000ms again
 #
-# After 500ms without another message:
+# After 1000ms without another message:
 #
 # All three messages are sent to the assistant together.
 #
 # Higher values reduce API calls but make the assistant feel
 # less responsive.
-message-batch-delay: 500
+message-batch-delay: 1000
 
 
 # ------------------------------------------------------------
@@ -88,7 +88,7 @@ max-batch-messages: 10
 # eventually be sent to the assistant.
 #
 # Set to 0 to disable the maximum wait time.
-max-batch-wait: 5000
+max-batch-wait: 10000
 
 
 # ============================================================
@@ -104,7 +104,7 @@ max-batch-wait: 5000
 # information. Server-specific information belongs in
 # advanced-info.
 prompt: |
-  You are ServerAssistant, an AI assistant for a Minecraft server.
+  You are ServerAssistant, an AI assistant inside a Minecraft server.
 
   Your role is to help players understand and interact with
   the server. You can answer questions, explain mechanics,
@@ -135,10 +135,10 @@ prompt: |
 
 
 # ============================================================
-# ADVANCED INFORMATION
+# ADVANCED CONTEXT
 # ============================================================
 
-# Advanced information contains additional knowledge that the
+# Advanced context contains additional knowledge that the
 # assistant can retrieve when necessary.
 #
 # In lazy-mode, this information is NOT sent to the model
@@ -151,20 +151,20 @@ prompt: |
 # This helps reduce token usage and avoids sending the entire
 # server configuration with every message.
 
-advanced-info:
+advanced-context:
 
   # ----------------------------------------------------------
   # LAZY LOADING
   # ----------------------------------------------------------
 
-  # When true, advanced information is fetched only when needed.
+  # When true, advanced context is fetched only when needed.
   #
-  # When false, all advanced information is provided to the
+  # When false, all advanced context is provided to the
   # assistant at the beginning of every conversation/request.
   lazy-mode: true
 
   # Message displayed to the player when the assistant needs
-  # to retrieve advanced information.
+  # to retrieve advanced context.
   #
   # Supports Minecraft color codes.
   #
@@ -184,14 +184,6 @@ advanced-info:
   #
   # Use descriptive, declarative names so the assistant can
   # easily determine which entry is relevant.
-  #
-  # Example:
-  #
-  # Player:
-  # "How do I claim a house?"
-  #
-  # Assistant:
-  # fetch("land_claiming")
   #
   # The model then receives the contents of that data chunk
   # before generating its final response.
@@ -260,16 +252,28 @@ advanced-info:
 # ============================================================
 # CHAT
 # ============================================================
+chat:
+  # Controls how assistant messages appear in Minecraft chat.
+  #
+  # Supported placeholders:
+  #
+  # %assistant_name%
+  # The configured assistant name.
+  #
+  # %message%
+  # The assistant's response.
+  #
+  # Supports Minecraft color and formatting codes.
+  assistant-format: "&b🤖 &b&l%assistant_name%: &r%message%"
 
-# Controls how assistant messages appear in Minecraft chat.
-#
-# Supported placeholders:
-#
-# %assistant_name%
-# The configured assistant name.
-#
-# %message%
-# The assistant's response.
-#
-# Supports Minecraft color and formatting codes.
-chat-format: "&b🤖 &b&l%assistant_name%: &r%message%"
+  # Maximum number of characters allowed in an assistant message.
+  #
+  # Longer responses are truncated before being sent to chat
+  # and stored in the conversation.
+  max-assistant-message-length: 250
+
+  # Maximum number of characters allowed in a player's message.
+  #
+  # Messages longer than this limit are truncated before being
+  # added to the conversation.
+  max-player-message-length: 250
