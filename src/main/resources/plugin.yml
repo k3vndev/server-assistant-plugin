@@ -8,9 +8,9 @@ description:
 author: k3vndev
 
 commands:
-  sva reload:
-    description: Reload the plugin config
-    usage: /sva reload
+  sva:
+    description: ServerAssistant command
+    usage: /sva <reload>
     permission: sva.reload
 
 permissions:

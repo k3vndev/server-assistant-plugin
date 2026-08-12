@@ -1,7 +1,3 @@
-# ============================================================
-# ServerAssistant Configuration
-# ============================================================
-
 # The name displayed by the assistant in chat.
 assistant-name: "ServerAssistant"
 
@@ -18,8 +14,8 @@ api-key: "YOUR_API_KEY_HERE"
 
 # Model used by the assistant.
 #
-# The exact model name depends on the configured AI provider.
-model: "YOUR_MODEL_HERE"
+# The exact model name expected by the AI provider.
+ai-model: "gpt-4o-mini"
 
 
 # ------------------------------------------------------------
@@ -85,7 +81,6 @@ message-batch-delay: 500
 # Set to 0 to disable the limit.
 max-batch-messages: 10
 
-
 # Maximum amount of time, in milliseconds, a batch can remain
 # open regardless of new messages being received.
 #
@@ -107,7 +102,7 @@ max-batch-wait: 5000
 #
 # Keep this focused on BEHAVIOR rather than server-specific
 # information. Server-specific information belongs in
-# advanced-info/data.
+# advanced-info.
 prompt: |
   You are ServerAssistant, an AI assistant for a Minecraft server.
 
@@ -176,7 +171,6 @@ advanced-info:
   # Leave empty ("") to disable the message.
   lazy-enter-message: "&7Hold on, let me check the server wiki..."
 
-
   # ----------------------------------------------------------
   # DATA CHUNKS
   # ----------------------------------------------------------
@@ -194,22 +188,17 @@ advanced-info:
   # Example:
   #
   # Player:
-  #   "How do I claim a house?"
+  # "How do I claim a house?"
   #
   # Assistant:
-  #   fetch("land_claiming")
+  # fetch("land_claiming")
   #
   # The model then receives the contents of that data chunk
   # before generating its final response.
-
   data:
 
-    # --------------------------------------------------------
-    # COMMANDS
-    # --------------------------------------------------------
-
     commands:
-      description: "Commands available to players and what each command does."
+      description: "Commands available on the server."
       content: |
         /daily
         Gives the player their daily random reward.
@@ -226,11 +215,6 @@ advanced-info:
         /tpa <player>
         Sends a teleport request to another player.
 
-
-    # --------------------------------------------------------
-    # SERVER RULES
-    # --------------------------------------------------------
-
     server-rules:
       description: "Rules that players must follow while playing on the server."
       content: |
@@ -241,117 +225,61 @@ advanced-info:
         5. Do not impersonate server staff.
         6. Follow staff instructions when necessary.
 
-
     # --------------------------------------------------------
-    # GAMEPLAY
-    # --------------------------------------------------------
-
-    gameplay:
-      description: "General information about how this server's gameplay works."
-      content: |
-        The server uses a survival-based gameplay system.
-
-        Players can build bases, explore the world, trade with
-        other players, participate in events, and collect resources.
-
-        PvP is enabled outside protected areas.
-
-
-    # --------------------------------------------------------
-    # ECONOMY
+    # ADDITIONAL EXAMPLES
     # --------------------------------------------------------
 
-    economy:
-      description: "Information about the server economy, currency, shops, and earning money."
-      content: |
-        The server currency is called Coins.
+    # gameplay:
+    #   description: "General information about how this server's gameplay works."
+    #   content: |
+    #     The server uses a survival-based gameplay system.
+    #
+    #     Players can build bases, explore the world, trade with
+    #     other players, participate in events, and collect resources.
+    #
+    #     PvP is enabled outside protected areas.
 
-        Players can earn Coins by completing quests,
-        selling items, participating in events, and voting.
+    # special-items:
+    #   description: "Custom items available on the server and their unique abilities."
+    #   content: |
+    #     BLAZE_HEART
+    #     A rare item obtained from high-level raids.
+    #     Can be used to craft the Infernal Sword.
+    #
+    #     FROZEN_CORE
+    #     Obtained from the Frost King boss.
+    #     Used to craft several ice-themed items.
 
-        Coins can be spent in player shops and server shops.
+    # quests:
+    #   description: "Available quests, objectives, rewards, and how players can start them."
+    #   content: |
+    #     Daily quests reset every 24 hours.
+    #
+    #     Players can view their available quests with /quests.
+    #
+    #     Completing quests rewards Coins and experience.
 
-        The /balance command displays the player's current balance.
+    # events:
+    #   description: "Current and recurring server events and how players can participate."
+    #   content: |
+    #     The server runs special events throughout the week.
+    #
+    #     Events may include PvP tournaments, treasure hunts,
+    #     boss fights, building competitions, and community events.
+    #
+    #     Event schedules are announced in chat and Discord.
 
-
-    # --------------------------------------------------------
-    # RAIDS
-    # --------------------------------------------------------
-
-    raids:
-      description: "Information about raids, raid mechanics, rewards, and requirements."
-      content: |
-        Raids are cooperative PvE events where players fight
-        increasingly difficult waves of enemies.
-
-        Players can join a raid using /raid join.
-
-        Higher raid difficulties provide better rewards.
-
-        Players must be at least level 10 to participate.
-
-
-    # --------------------------------------------------------
-    # SPECIAL ITEMS
-    # --------------------------------------------------------
-
-    special-items:
-      description: "Custom items available on the server and their unique abilities."
-      content: |
-        BLAZE_HEART
-        A rare item obtained from high-level raids.
-        Can be used to craft the Infernal Sword.
-
-        FROZEN_CORE
-        Obtained from the Frost King boss.
-        Used to craft several ice-themed items.
-
-
-    # --------------------------------------------------------
-    # QUESTS
-    # --------------------------------------------------------
-
-    quests:
-      description: "Available quests, objectives, rewards, and how players can start them."
-      content: |
-        Daily quests reset every 24 hours.
-
-        Players can view their available quests with /quests.
-
-        Completing quests rewards Coins and experience.
-
-
-    # --------------------------------------------------------
-    # EVENTS
-    # --------------------------------------------------------
-
-    events:
-      description: "Current and recurring server events and how players can participate."
-      content: |
-        The server runs special events throughout the week.
-
-        Events may include PvP tournaments, treasure hunts,
-        boss fights, building competitions, and community events.
-
-        Event schedules are announced in chat and Discord.
-
-
-    # --------------------------------------------------------
-    # WORLD
-    # --------------------------------------------------------
-
-    world:
-      description: "Important locations, dimensions, world features, and exploration information."
-      content: |
-        The main world contains several towns and protected areas.
-
-        The server spawn is located in the central town.
-
-        The Nether can be accessed through the portal at spawn.
-
-        The End is currently locked and will be opened during
-        a future server event.
-
+    # world:
+    #   description: "Important locations, dimensions, world features, and exploration information."
+    #   content: |
+    #     The main world contains several towns and protected areas.
+    #
+    #     The server spawn is located in the central town.
+    #
+    #     The Nether can be accessed through the portal at spawn.
+    #
+    #     The End is currently locked and will be opened during
+    #     a future server event.
 
     # --------------------------------------------------------
     # STAFF
@@ -367,7 +295,6 @@ advanced-info:
         Administrators handle technical issues and server management.
 
         Do not provide private information about staff members.
-
 
     # --------------------------------------------------------
     # SERVER FAQ
@@ -405,6 +332,4 @@ advanced-info:
 # The assistant's response.
 #
 # Supports Minecraft color and formatting codes.
-
 chat-format: "&b🤖 &b&l%assistant_name%: &r%message%"
-```
