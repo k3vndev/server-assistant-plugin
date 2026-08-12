@@ -225,66 +225,6 @@ advanced-info:
         5. Do not impersonate server staff.
         6. Follow staff instructions when necessary.
 
-    # --------------------------------------------------------
-    # ADDITIONAL EXAMPLES
-    # --------------------------------------------------------
-
-    # gameplay:
-    #   description: "General information about how this server's gameplay works."
-    #   content: |
-    #     The server uses a survival-based gameplay system.
-    #
-    #     Players can build bases, explore the world, trade with
-    #     other players, participate in events, and collect resources.
-    #
-    #     PvP is enabled outside protected areas.
-
-    # special-items:
-    #   description: "Custom items available on the server and their unique abilities."
-    #   content: |
-    #     BLAZE_HEART
-    #     A rare item obtained from high-level raids.
-    #     Can be used to craft the Infernal Sword.
-    #
-    #     FROZEN_CORE
-    #     Obtained from the Frost King boss.
-    #     Used to craft several ice-themed items.
-
-    # quests:
-    #   description: "Available quests, objectives, rewards, and how players can start them."
-    #   content: |
-    #     Daily quests reset every 24 hours.
-    #
-    #     Players can view their available quests with /quests.
-    #
-    #     Completing quests rewards Coins and experience.
-
-    # events:
-    #   description: "Current and recurring server events and how players can participate."
-    #   content: |
-    #     The server runs special events throughout the week.
-    #
-    #     Events may include PvP tournaments, treasure hunts,
-    #     boss fights, building competitions, and community events.
-    #
-    #     Event schedules are announced in chat and Discord.
-
-    # world:
-    #   description: "Important locations, dimensions, world features, and exploration information."
-    #   content: |
-    #     The main world contains several towns and protected areas.
-    #
-    #     The server spawn is located in the central town.
-    #
-    #     The Nether can be accessed through the portal at spawn.
-    #
-    #     The End is currently locked and will be opened during
-    #     a future server event.
-
-    # --------------------------------------------------------
-    # STAFF
-    # --------------------------------------------------------
-
     staff:
       description: "Server staff roles and how players can contact staff members."
       content: |
