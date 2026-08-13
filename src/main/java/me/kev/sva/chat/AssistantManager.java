@@ -13,6 +13,10 @@ import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 
+import me.kev.sva.chat.message.AssistantChatMessage;
+import me.kev.sva.chat.message.BroadcastChatMessage;
+import me.kev.sva.chat.message.ChatMessage;
+import me.kev.sva.chat.message.PlayerChatMessage;
 import me.kev.sva.utils.MessageSender;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
@@ -47,7 +51,7 @@ public class AssistantManager {
     shutdown = true;
   }
 
-  public void promptAIModel() {
+  public void sendAIRequest() {
     if (shutdown)
       return;
     String configuredModel = plugin.getConfig().getString("ai-model");
@@ -91,16 +95,11 @@ public class AssistantManager {
 
           String assistantMessageText = sanitizeAssistantMessage(text);
 
-          ChatMessage assistantMessage = new ChatMessage(
-              plugin.getConfig().getString(
-                  "assistant-name",
-                  "ServerAssistant"),
-              true,
-              assistantMessageText);
-
           if (shutdown)
             return;
 
+          AssistantChatMessage assistantMessage = new AssistantChatMessage(
+              assistantMessageText);
           conversationManager.addChatMessage(assistantMessage);
 
           Bukkit.getScheduler().runTask(plugin, () -> {
@@ -141,8 +140,7 @@ public class AssistantManager {
     LocalDateTime now = LocalDateTime.now();
 
     String serverContext = """
-        SERVER DATA:
-
+        [SERVER DATA]
         Current time: %s
         Current date: %s
         Online players: %d
@@ -174,19 +172,25 @@ public class AssistantManager {
         250);
 
     for (ChatMessage message : chatMessages) {
-      if (message.isAssistant) {
-        paramsBuilder.addAssistantMessage(message.content);
+      if (message instanceof AssistantChatMessage assistantMessage) {
+        paramsBuilder.addAssistantMessage(assistantMessage.content);
         continue;
       }
 
-      String content = message.content;
+      if (message instanceof PlayerChatMessage playerMessage) {
+        String msg = message.content;
 
-      if (maxPlayerMessageLength > 0 && content.length() > maxPlayerMessageLength) {
-        content = content.substring(0, maxPlayerMessageLength);
+        if (maxPlayerMessageLength > 0 && msg.length() > maxPlayerMessageLength) {
+          msg = msg.substring(0, maxPlayerMessageLength);
+        }
+
+        paramsBuilder.addSystemMessage(playerMessage.header + msg);
+        continue;
       }
 
-      paramsBuilder.addUserMessage(
-          "[" + message.senderName + "] " + content);
+      if (message instanceof BroadcastChatMessage broadcastMessage) {
+        paramsBuilder.addSystemMessage(broadcastMessage.header + broadcastMessage.content);
+      }
     }
   }
 

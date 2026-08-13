@@ -55,7 +55,7 @@ public final class ServerAssistant extends JavaPlugin {
 
         // Create new conversation manager (reads updated config) and register listener
         conversationManager = new ConversationManager(this);
-        chatListener = new ChatListener(conversationManager);
+        chatListener = new ChatListener(this, conversationManager);
         getServer().getPluginManager().registerEvents(chatListener, this);
     }
 

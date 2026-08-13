@@ -33,62 +33,131 @@ message-history-limit: 15
 
 
 # ------------------------------------------------------------
+# REQUEST TRIGGERS
+# ------------------------------------------------------------
+request-triggers:
+
+  # Determines when player chat messages should trigger an AI
+  # request.
+  #
+  # "always"     - Every player message can trigger a request.
+  # "mention"    - Only messages mentioning the assistant trigger
+  #                a request.
+  # "disabled"   - Player messages never trigger requests.
+  #
+  # Note that triggering a request does not necessarily mean the
+  # assistant will respond. The AI can still choose to do nothing.
+  player-messages:
+    mode: mention
+
+    # Words or phrases that indicate the assistant is being
+    # directly addressed. Case-Insensitive.
+    #
+    # Only used when mode is set to "mention".
+    mentions:
+      - "Server Assistant" # "server assistant" also counts
+      - "ServerAssistant" # "sErverassistaNT" also counts
+      - "@SVA" # "@sva" also counts
+
+
+  # ------------------------------------------------------------
+  # GLOBAL EVENTS
+  # ------------------------------------------------------------
+  global-events:
+
+    # Whether configured global events should trigger an AI request.
+    #
+    # The event itself is passed to the AI as context. The AI can
+    # then decide whether it should respond, use a tool, or do
+    # nothing.
+    enabled: true
+
+    # Global events that should trigger an AI request.
+    #
+    # Each event is handled by its corresponding Bukkit/Paper
+    # event listener. This means the assistant can receive useful
+    # information about what actually happened, rather than only
+    # receiving the resulting broadcast message.
+    events:
+
+      # Triggered when a player dies.
+      #
+      # The AI receives the player involved and the death message.
+      player-death: true
+
+      # Triggered when a player completes an advancement.
+      #
+      # Only advancements that actually have an announcement
+      # message are forwarded.
+      player-advancement: true
+
+      # Triggered when a player joins the server.
+      player-join: false
+
+      # Triggered when a player leaves the server.
+      player-quit: false
+
+      # Triggered when a player is kicked from the server.
+      player-kick: false
+
+
+  # Allows the assistant to receive a request after the server
+  # has been inactive for a random amount of time.
+  #
+  # The timer starts after a player sends a message and is reset
+  # whenever another player message is received.
+  #
+  # Messages sent by the assistant itself do not reset the timer.
+  scheduling:
+
+    # Whether scheduled requests are enabled.
+    enabled: true
+
+    # Minimum amount of time, in milliseconds, to wait after the
+    # last player message before the assistant may be prompted.
+    min-delay: 30000
+
+    # Maximum amount of time, in milliseconds, to wait after the
+    # last player message before the assistant may be prompted.
+    #
+    # A random delay between min-delay and max-delay is selected.
+    max-delay: 120000
+
+
+# ------------------------------------------------------------
 # MESSAGE BATCHING
 # ------------------------------------------------------------
+message-batching:
+  # Amount of time, in milliseconds, the plugin waits after
+  # receiving a message before sending it to the AI.
+  #
+  # If another message is received during this period, it is
+  # added to the same batch and the timer starts again.
+  #
+  # This prevents multiple AI requests when players send several
+  # messages in quick succession.
+  #
+  # Higher values reduce API calls but make the assistant feel
+  # less responsive.
+  wait-time: 1500
 
-# Amount of time, in milliseconds, the plugin waits after
-# receiving a message before sending it to the AI.
-#
-# If another message is received during this period, it is
-# added to the same batch and the timer starts again.
-#
-# This prevents multiple AI requests when players send several
-# messages in quick succession.
-#
-# Example with message-batch-delay: 1000:
-#
-# Player: "hey"
-#       ↓
-#       wait 1000ms
-#
-# Player: "are you there?"
-#       ↓
-#       timer resets, so wait 1000ms again
-#
-# Player: "I have a question"
-#       ↓
-#       timer resets, so wait 1000ms again
-#
-# After 1000ms without another message:
-#
-# All three messages are sent to the assistant together.
-#
-# Higher values reduce API calls but make the assistant feel
-# less responsive.
-message-batch-delay: 1000
+  # Maximum amount of time, in milliseconds, a batch can remain
+  # open regardless of new messages being received.
+  #
+  # This guarantees that a continuously active chat will
+  # eventually be sent to the assistant.
+  #
+  # Set to 0 to disable the maximum wait time.
+  max-wait-time: 10000
 
-
-# ------------------------------------------------------------
-# REQUEST LIMITS
-# ------------------------------------------------------------
-
-# Maximum number of messages that can be included in a single
-# batch before it is sent to the assistant.
-#
-# This prevents a player from continuously extending the
-# batching window by sending messages repeatedly.
-#
-# Set to 0 to disable the limit.
-max-batch-messages: 10
-
-# Maximum amount of time, in milliseconds, a batch can remain
-# open regardless of new messages being received.
-#
-# This guarantees that a continuously active chat will
-# eventually be sent to the assistant.
-#
-# Set to 0 to disable the maximum wait time.
-max-batch-wait: 10000
+  # Maximum number of messages that can be included in a single
+  # batch before it is sent to the assistant.
+  #
+  # This prevents a player from continuously extending the
+  # batching window by sending messages repeatedly.
+  #
+  # Set to 0 to disable the limit.
+  max-size: 10
 
 
 # ============================================================
@@ -162,14 +231,6 @@ advanced-context:
   # When false, all advanced context is provided to the
   # assistant at the beginning of every conversation/request.
   lazy-mode: true
-
-  # Message displayed to the player when the assistant needs
-  # to retrieve advanced context.
-  #
-  # Supports Minecraft color codes.
-  #
-  # Leave empty ("") to disable the message.
-  lazy-enter-message: "&7Hold on, let me check the server wiki..."
 
   # ----------------------------------------------------------
   # DATA CHUNKS

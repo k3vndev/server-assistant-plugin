@@ -3,6 +3,8 @@ package me.kev.sva.chat;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import me.kev.sva.chat.message.ChatMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,9 @@ public class ConversationManager {
     conversation.clear();
   }
 
-  public void playerMessage(ChatMessage message) {
+  public void queueNewMessage(ChatMessage message) {
+    plugin.getLogger().severe("[SVA] Quequed: " + message.content);
+
     addChatMessage(message);
 
     if (batchMessageCount == 0) {
@@ -49,7 +53,7 @@ public class ConversationManager {
     batchMessageCount++;
 
     int maxMessages = plugin.getConfig().getInt(
-        "max-batch-messages",
+        "message-batching.max-size",
         10);
 
     if (maxMessages > 0 && batchMessageCount >= maxMessages) {
@@ -108,6 +112,10 @@ public class ConversationManager {
   }
 
   private void processBatch() {
+    if (getOnlinePlayerCount() == 0) {
+      return;
+    }
+
     if (batchTask != null) {
       batchTask.cancel();
       batchTask = null;
@@ -121,7 +129,7 @@ public class ConversationManager {
     batchMessageCount = 0;
     batchStartTime = 0;
 
-    assistantManager.promptAIModel();
+    assistantManager.sendAIRequest();
   }
 
   public List<ChatMessage> getConversation() {
@@ -147,14 +155,21 @@ public class ConversationManager {
   }
 
   private long getMessageBatchDelayMs() {
-    return plugin.getConfig().getLong("message-batch-delay", 500);
+    return plugin.getConfig().getLong("message-batching.wait-time", 500);
   }
 
   private long getMaxBatchWaitMs() {
-    return plugin.getConfig().getLong("max-batch-wait", 10000);
+    return plugin.getConfig().getLong("message-batching.max-wait-time", 10000);
   }
 
   private int getMessageHistoryLimit() {
     return plugin.getConfig().getInt("message-history-limit", 15);
+  }
+
+  /**
+   * Returns the current number of online players on the server.
+   */
+  public int getOnlinePlayerCount() {
+    return plugin.getServer().getOnlinePlayers().size();
   }
 }
