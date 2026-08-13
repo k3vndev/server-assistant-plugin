@@ -111,16 +111,16 @@ public class AssistantManager {
       ChatCompletionCreateParams.Builder paramsBuilder) {
 
     // Main primary prompt
-    paramsBuilder.addSystemMessage(AssistantPrompts.PRIMARY_SYSTEM_INSTRUCTIONS);
+    paramsBuilder.addSystemMessage(AssistantContextualizer.PRIMARY_SYSTEM_INSTRUCTIONS);
 
     // Personality prompt
     String personalityPrompt = plugin.getConfig().getString(
         "prompt",
-        AssistantPrompts.DEFAULT_PERSONALITY_PROMPT);
+        AssistantContextualizer.DEFAULT_PERSONALITY_PROMPT);
 
-    paramsBuilder.addSystemMessage(AssistantPrompts.PERSONALITY_PROMPT_HEADER + personalityPrompt);
+    paramsBuilder.addSystemMessage(AssistantContextualizer.PERSONALITY_PROMPT_HEADER + personalityPrompt);
 
-    paramsBuilder.addSystemMessage(AssistantPrompts.getServerContext());
+    paramsBuilder.addSystemMessage(AssistantContextualizer.getServerContext());
 
     // Max assistant message length
     int maxAssistantMessageLength = plugin.getConfig().getInt(
@@ -132,7 +132,7 @@ public class AssistantManager {
         """.formatted(maxAssistantMessageLength));
 
     // Avilable tools prompt
-    paramsBuilder.addSystemMessage(AssistantPrompts.getAvailableTools(plugin));
+    paramsBuilder.addSystemMessage(AssistantContextualizer.getAvailableTools(plugin));
   }
 
   private void appendConversationMessagesToBuilder(

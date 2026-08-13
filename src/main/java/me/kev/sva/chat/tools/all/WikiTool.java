@@ -39,7 +39,7 @@ public class WikiTool extends Tool {
           .append("\n");
     }
 
-    MessageSender.Success(result.toString());
+    // MessageSender.Success(result.toString());
     return result.toString();
   }
 
@@ -57,7 +57,7 @@ public class WikiTool extends Tool {
       return "Unknown wiki key: " + key;
     }
 
-    MessageSender.Success(section.getString("content", ""));
+    // MessageSender.Success(section.getString("content", ""));
     return section.getString("content", "");
   }
 }

@@ -24,6 +24,7 @@ public class ChatListener implements Listener {
 
   private final ConversationManager conversationManager;
   private final ServerAssistantPlugin plugin;
+  private volatile long smartConversationLastMessage = 0;
 
   public ChatListener(ServerAssistantPlugin plugin, ConversationManager conversationManager) {
     this.plugin = plugin;
@@ -55,16 +56,9 @@ public class ChatListener implements Listener {
     return switch (mode.toLowerCase(Locale.ROOT)) {
       case "always" -> true;
 
-      case "mention" -> {
-        List<String> mentions = config.getStringList(
-            "request-triggers.player-messages.mentions");
+      case "mention" -> containsMention(message);
 
-        String lowerMessage = message.toLowerCase(Locale.ROOT);
-
-        yield mentions.stream()
-            .map(mention -> mention.toLowerCase(Locale.ROOT))
-            .anyMatch(lowerMessage::contains);
-      }
+      case "smart" -> shouldProcessSmartMessage(message);
 
       case "disabled" -> false;
 
@@ -75,6 +69,45 @@ public class ChatListener implements Listener {
         yield false;
       }
     };
+  }
+
+  private boolean containsMention(String message) {
+    List<String> mentions = plugin.getConfig()
+        .getStringList(
+            "request-triggers.player-messages.mentions");
+
+    String lowerMessage = message.toLowerCase(Locale.ROOT);
+
+    return mentions.stream()
+        .map(mention -> mention.toLowerCase(Locale.ROOT))
+        .anyMatch(lowerMessage::contains);
+  }
+
+  private boolean shouldProcessSmartMessage(String message) {
+    long now = System.currentTimeMillis();
+
+    long activeTime = Math.max(
+        plugin.getConfig().getLong(
+            "request-triggers.player-messages.smart-active-time",
+            30000),
+        0);
+
+    // A mention starts (or reopens) the conversation.
+    if (containsMention(message)) {
+      smartConversationLastMessage = now;
+      return true;
+    }
+
+    // Continue an existing conversation.
+    if (smartConversationLastMessage > 0
+        && now - smartConversationLastMessage <= activeTime) {
+
+      smartConversationLastMessage = now;
+      return true;
+    }
+
+    // No active conversation.
+    return false;
   }
 
   // ------------------------------------------------------------

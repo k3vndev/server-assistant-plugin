@@ -4,7 +4,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.assistant.AssistantManager;
-import me.kev.sva.chat.assistant.AssistantPrompts;
+import me.kev.sva.chat.assistant.AssistantContextualizer;
 import me.kev.sva.chat.assistant.AssistantResponse;
 import me.kev.sva.chat.message.AssistantChatMessage;
 import me.kev.sva.chat.message.ChatMessage;
@@ -28,7 +28,7 @@ public class ConversationManager {
     this.assistantManager = new AssistantManager(plugin, this);
 
     // Add an initial message
-    AssistantResponse initialAssistantResponse = AssistantPrompts.getInitialResponse(plugin);
+    AssistantResponse initialAssistantResponse = AssistantContextualizer.getInitialResponse(plugin);
     AssistantChatMessage initialAssistantChatMessage = new AssistantChatMessage(plugin, initialAssistantResponse.raw);
     conversation.add(initialAssistantChatMessage);
   }

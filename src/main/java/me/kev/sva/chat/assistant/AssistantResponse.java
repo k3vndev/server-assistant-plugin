@@ -82,7 +82,12 @@ public class AssistantResponse {
     data.put("tool-calls", toolCalls);
 
     DumperOptions options = new DumperOptions();
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+    options.setDefaultFlowStyle(
+        DumperOptions.FlowStyle.BLOCK);
+
+    options.setDefaultScalarStyle(
+        DumperOptions.ScalarStyle.DOUBLE_QUOTED);
 
     Yaml yaml = new Yaml(options);
 

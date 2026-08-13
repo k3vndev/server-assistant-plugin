@@ -36,24 +36,40 @@ message-history-limit: 15
 # REQUEST TRIGGERS
 # ------------------------------------------------------------
 request-triggers:
-
   # Determines when player chat messages should trigger an AI
   # request.
-  #
-  # "always"     - Every player message can trigger a request.
-  # "mention"    - Only messages mentioning the assistant trigger
-  #                a request.
-  # "disabled"   - Player messages never trigger requests.
   #
   # Note that triggering a request does not necessarily mean the
   # assistant will respond. The AI can still choose to do nothing.
   player-messages:
-    mode: mention
+    # "always"     - Every player message can trigger a request.
+    # "mention"    - Only messages mentioning the assistant can
+    #                trigger a request.
+    # "smart"      - Works like "mention", but after the assistant
+    #                is mentioned, subsequent player messages can
+    #                trigger requests while the conversation remains
+    #                active. The active period resets whenever a new
+    #                player message is received.
+    # "disabled"   - Player messages never trigger requests.
+    #
+    mode: smart
+
+    # Amount of time, in milliseconds, that "smart" mode remains
+    # active after the last player message.
+    #
+    # While active, every new player message can trigger an AI
+    # request without requiring another mention.
+    #
+    # The timer resets whenever a new player message is received.
+    #
+    # Once this time passes without any new player messages, the
+    # assistant becomes inactive and must be mentioned again.
+    smart-active-time: 30000
 
     # Words or phrases that indicate the assistant is being
     # directly addressed. Case-Insensitive.
     #
-    # Only used when mode is set to "mention".
+    # Used by "mention" and "smart" modes.
     mentions:
       - "Server Assistant" # "server assistant" also counts
       - "ServerAssistant" # "sErverassistaNT" also counts
@@ -289,9 +305,11 @@ chat:
   # Supports Minecraft color and formatting codes.
   assistant-format: "&b🤖 &b&l%assistant_name%: &r%message%"
 
-  # An initial message is always sent when the assistant first "wakes up" so it
-  # internaly understands the response format better.
-  # The assistant will see this message, but players won't.
+  # An initial message is always added when the assistant first "wakes up"
+  # so it can internally establish the expected response format.
+  #
+  # The assistant sees this message as if it had sent it itself, but players
+  # never see it.
   assistant-initial-message: "hello world!"
 
   # If the assistant sent multiple messages in one response,

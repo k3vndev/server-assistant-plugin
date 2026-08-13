@@ -15,6 +15,13 @@ import me.kev.sva.utils.MessageSender;
 import net.kyori.adventure.text.Component;
 
 public class CommandManager implements TabExecutor {
+  private static final String PLAYER_CHAT_MODE_COMMAND = "playerchatmode";
+  private static final List<String> PLAYER_CHAT_MODE_OPTIONS = List.of("always", "mention", "smart", "disabled");
+
+  private static String buildPlayerChatModeUsage() {
+    return "/sva " + PLAYER_CHAT_MODE_COMMAND + " <" + String.join("|", PLAYER_CHAT_MODE_OPTIONS) + ">";
+  }
+
   private final ServerAssistantPlugin plugin;
 
   public CommandManager(ServerAssistantPlugin plugin) {
@@ -65,12 +72,12 @@ public class CommandManager implements TabExecutor {
     }
 
     // /sva playerchatmode <mode>
-    if (args.length == 2 && args[0].equalsIgnoreCase("playerchatmode")) {
+    if (args.length == 2 && args[0].equalsIgnoreCase(PLAYER_CHAT_MODE_COMMAND)) {
       String mode = args[1].toLowerCase(Locale.ROOT);
 
-      if (!List.of("always", "mention", "disabled").contains(mode)) {
+      if (!PLAYER_CHAT_MODE_OPTIONS.contains(mode)) {
         MessageSender.Error(
-            "Invalid mode. Use: always, mention, or disabled.");
+            "Invalid mode. Use: " + String.join(", ", PLAYER_CHAT_MODE_OPTIONS) + ".");
 
         return true;
       }
@@ -88,7 +95,7 @@ public class CommandManager implements TabExecutor {
     }
 
     sender.sendMessage(Component.text(
-        "Usage: /sva reload | /sva playerchatmode <always|mention|disabled>"));
+        "Usage: /sva reload | " + buildPlayerChatModeUsage()));
 
     return true;
   }
@@ -110,7 +117,7 @@ public class CommandManager implements TabExecutor {
 
     if (args.length == 1) {
       List<String> completions = new ArrayList<>(
-          List.of("reload", "playerchatmode"));
+          List.of("reload", PLAYER_CHAT_MODE_COMMAND));
 
       List<String> matches = new ArrayList<>();
 
@@ -125,13 +132,13 @@ public class CommandManager implements TabExecutor {
     }
 
     if (args.length == 2
-        && args[0].equalsIgnoreCase("playerchatmode")) {
+        && args[0].equalsIgnoreCase(PLAYER_CHAT_MODE_COMMAND)) {
 
       List<String> matches = new ArrayList<>();
 
       StringUtil.copyPartialMatches(
           args[1],
-          List.of("always", "mention", "disabled"),
+          PLAYER_CHAT_MODE_OPTIONS,
           matches);
 
       return matches;
