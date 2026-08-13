@@ -1,25 +1,20 @@
-package me.kev.sva.chat;
+package me.kev.sva.chat.assistant;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 
+import me.kev.sva.chat.ConversationManager;
 import me.kev.sva.chat.message.AssistantChatMessage;
 import me.kev.sva.chat.message.BroadcastChatMessage;
 import me.kev.sva.chat.message.ChatMessage;
 import me.kev.sva.chat.message.PlayerChatMessage;
 import me.kev.sva.utils.MessageSender;
-import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.ChatColor;
 
 public class AssistantManager {
   private final JavaPlugin plugin;
@@ -84,6 +79,7 @@ public class AssistantManager {
 
           if (shutdown)
             return;
+
           String text = response.choices()
               .get(0)
               .message()
@@ -93,22 +89,9 @@ public class AssistantManager {
           if (text.isEmpty())
             return;
 
-          String assistantMessageText = sanitizeAssistantMessage(text);
-
-          if (shutdown)
-            return;
-
-          AssistantChatMessage assistantMessage = new AssistantChatMessage(
-              assistantMessageText);
+          AssistantChatMessage assistantMessage = new AssistantChatMessage(plugin, text);
           conversationManager.addChatMessage(assistantMessage);
-
-          Bukkit.getScheduler().runTask(plugin, () -> {
-            if (shutdown)
-              return;
-            plugin.getServer().broadcast(
-                Component.text(
-                    formatAssistantMessage(assistantMessageText)));
-          });
+          assistantMessage.response.broadcast();
         })
         .exceptionally(error -> {
           if (!shutdown) {
@@ -122,38 +105,19 @@ public class AssistantManager {
   private void appendSystemPromptsToBuilder(
       ChatCompletionCreateParams.Builder paramsBuilder) {
 
+    // Main primary prompt
+    paramsBuilder.addSystemMessage(AssistantPrompts.PRIMARY_SYSTEM_INSTRUCTIONS);
+
     // Personality prompt
     String personalityPrompt = plugin.getConfig().getString(
         "prompt",
-        "You are ServerAssistant, an AI assistant inside a Minecraft server.");
+        AssistantPrompts.DEFAULT_PERSONALITY_PROMPT);
 
-    paramsBuilder.addSystemMessage(personalityPrompt);
+    paramsBuilder.addSystemMessage(AssistantPrompts.PERSONALITY_PROMPT_HEADER + personalityPrompt);
 
-    // Server information
-    int onlineCount = Bukkit.getOnlinePlayers().size();
+    paramsBuilder.addSystemMessage(AssistantPrompts.getServerContext());
 
-    String onlinePlayers = Bukkit.getOnlinePlayers().stream()
-        .map(player -> player.getName())
-        .sorted()
-        .collect(Collectors.joining(", "));
-
-    LocalDateTime now = LocalDateTime.now();
-
-    String serverContext = """
-        [SERVER DATA]
-        Current time: %s
-        Current date: %s
-        Online players: %d
-        Player names: %s
-        """.formatted(
-        now.format(DateTimeFormatter.ofPattern("HH:mm")),
-        now.toLocalDate(),
-        onlineCount,
-        onlinePlayers.isEmpty() ? "none" : onlinePlayers);
-
-    paramsBuilder.addSystemMessage(serverContext);
-
-    // Max assistant message lenght
+    // Max assistant message length
     int maxAssistantMessageLength = plugin.getConfig().getInt(
         "chat.max-assistant-message-length",
         250);
@@ -194,34 +158,4 @@ public class AssistantManager {
     }
   }
 
-  private String formatAssistantMessage(String text) {
-    String assistantName = plugin.getConfig().getString(
-        "assistant-name",
-        "ServerAssistant");
-
-    String format = plugin.getConfig().getString(
-        "chat.assistant-format",
-        "&b🤖 &b&l%assistant_name%: &r%message%");
-
-    return ChatColor.translateAlternateColorCodes(
-        '&',
-        format
-            .replace("%assistant_name%", assistantName)
-            .replace("%message%", text));
-  }
-
-  private String sanitizeAssistantMessage(String text) {
-    if (text == null || text.isEmpty()) {
-      return "";
-    }
-
-    return text.replaceAll(
-        "[\\x{1F000}-\\x{1FAFF}" +
-            "\\x{2600}-\\x{27BF}" +
-            "\\x{2300}-\\x{23FF}" +
-            "\\x{2B00}-\\x{2BFF}" +
-            "\\x{FE00}-\\x{FE0F}" +
-            "\\x{1F1E6}-\\x{1F1FF}]",
-        "");
-  }
 }

@@ -1,6 +1,7 @@
 package me.kev.sva.chat.message;
 
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -8,8 +9,8 @@ public class PlayerChatMessage extends ChatMessage {
   public final Player player;
   public final String header;
 
-  public PlayerChatMessage(Player player, String content) {
-    super(content);
+  public PlayerChatMessage(JavaPlugin plugin, Player player, String content) {
+    super(plugin, content);
     this.player = player;
 
     // Parse header

@@ -42,7 +42,7 @@ public class ChatListener implements Listener {
     }
 
     conversationManager.queueNewMessage(
-        new PlayerChatMessage(player, message));
+        new PlayerChatMessage(plugin, player, message));
   }
 
   private boolean shouldProcessPlayerMessage(String message) {
@@ -102,7 +102,7 @@ public class ChatListener implements Listener {
     }
 
     conversationManager.queueNewMessage(
-        new BroadcastChatMessage(message));
+        new BroadcastChatMessage(plugin, message));
   }
 
   private String plain(Component component) {

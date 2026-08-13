@@ -3,6 +3,10 @@ package me.kev.sva.chat;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import me.kev.sva.chat.assistant.AssistantManager;
+import me.kev.sva.chat.assistant.AssistantPrompts;
+import me.kev.sva.chat.assistant.AssistantResponse;
+import me.kev.sva.chat.message.AssistantChatMessage;
 import me.kev.sva.chat.message.ChatMessage;
 
 import java.util.ArrayList;
@@ -22,6 +26,11 @@ public class ConversationManager {
   public ConversationManager(JavaPlugin plugin) {
     this.plugin = plugin;
     this.assistantManager = new AssistantManager(plugin, this);
+
+    // Add an initial message
+    AssistantResponse initialAssistantResponse = AssistantPrompts.getInitialResponse(plugin);
+    AssistantChatMessage initialAssistantChatMessage = new AssistantChatMessage(plugin, initialAssistantResponse.raw);
+    conversation.add(initialAssistantChatMessage);
   }
 
   public void shutdown() {

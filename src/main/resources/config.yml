@@ -173,7 +173,7 @@ message-batching:
 # information. Server-specific information belongs in
 # advanced-info.
 prompt: |
-  You are ServerAssistant, an AI assistant inside a Minecraft server.
+  You are Sever Assistant, SVA for short. A helpful friend that lives inside a Minecraft server.
 
   Your role is to help players understand and interact with
   the server. You can answer questions, explain mechanics,
@@ -326,6 +326,15 @@ chat:
   #
   # Supports Minecraft color and formatting codes.
   assistant-format: "&b🤖 &b&l%assistant_name%: &r%message%"
+
+  # An initial message is always sent when the assistant first "wakes up" so it
+  # internaly understands the response format better.
+  # The assistant will see this message, but players won't.
+  assistant-initial-message: "hello world!"
+
+  # If the assistant sent multiple messages in one response,
+  # wait this milliseconds between each one.
+  assistant-chained-messages-delay: 750
 
   # Maximum number of characters allowed in an assistant message.
   #

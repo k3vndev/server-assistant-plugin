@@ -9,11 +9,11 @@ author: k3vndev
 
 commands:
   sva:
-    description: ServerAssistant command
-    usage: /sva <reload>
-    permission: sva.reload
+    description: ServerAssistant main command
+    usage: /sva <params>
+    permission: sva.admin
 
 permissions:
-  sva.reload:
-    description: Allows reloading the plugin configuration
+  sva.admin:
+    description: Allows reloading or modifying the plugin configuration
     default: op
