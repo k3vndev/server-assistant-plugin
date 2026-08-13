@@ -233,7 +233,7 @@ advanced-context:
   lazy-mode: true
 
   # ----------------------------------------------------------
-  # DATA CHUNKS
+  # (WIKI) DATA CHUNKS
   # ----------------------------------------------------------
 
   # Each entry represents an independent piece of server
@@ -248,14 +248,10 @@ advanced-context:
   #
   # The model then receives the contents of that data chunk
   # before generating its final response.
-  data:
-
+  wiki:
     commands:
-      description: "Commands available on the server."
+      description: Commands available on the server.
       content: |
-        /daily
-        Gives the player their daily random reward.
-
         /spawn
         Teleports the player to the server spawn.
 
@@ -267,48 +263,14 @@ advanced-context:
 
         /tpa <player>
         Sends a teleport request to another player.
-
     server-rules:
-      description: "Rules that players must follow while playing on the server."
+      description: Rules that players must follow while playing on the server.
       content: |
         1. No cheating or hacked clients.
         2. No exploiting bugs for personal advantage.
         3. Do not spam the chat.
         4. Do not intentionally harass other players.
-        5. Do not impersonate server staff.
-        6. Follow staff instructions when necessary.
-
-    staff:
-      description: "Server staff roles and how players can contact staff members."
-      content: |
-        Players can contact staff using /helpop.
-
-        Moderators handle player reports and rule violations.
-
-        Administrators handle technical issues and server management.
-
-        Do not provide private information about staff members.
-
-    # --------------------------------------------------------
-    # SERVER FAQ
-    # --------------------------------------------------------
-
-    frequently-asked-questions:
-      description: "Answers to common questions players frequently ask about the server."
-      content: |
-        How do I get started?
-        Visit spawn and use /kit starter.
-
-        How do I earn money?
-        Complete quests, sell resources, participate in events,
-        and vote for the server.
-
-        How do I contact staff?
-        Use /helpop followed by your message.
-
-        Where can I find shops?
-        Shops are located in the main town.
-
+        5. Follow staff instructions when necessary.
 
 # ============================================================
 # CHAT

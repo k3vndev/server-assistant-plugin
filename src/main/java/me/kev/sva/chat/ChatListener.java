@@ -12,9 +12,9 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.message.BroadcastChatMessage;
 import me.kev.sva.chat.message.PlayerChatMessage;
 import net.kyori.adventure.text.Component;
@@ -23,9 +23,9 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 public class ChatListener implements Listener {
 
   private final ConversationManager conversationManager;
-  private final JavaPlugin plugin;
+  private final ServerAssistantPlugin plugin;
 
-  public ChatListener(JavaPlugin plugin, ConversationManager conversationManager) {
+  public ChatListener(ServerAssistantPlugin plugin, ConversationManager conversationManager) {
     this.plugin = plugin;
     this.conversationManager = conversationManager;
   }

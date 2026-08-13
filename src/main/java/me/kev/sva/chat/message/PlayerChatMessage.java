@@ -1,15 +1,15 @@
 package me.kev.sva.chat.message;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
+import me.kev.sva.ServerAssistantPlugin;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PlayerChatMessage extends ChatMessage {
   public final Player player;
   public final String header;
 
-  public PlayerChatMessage(JavaPlugin plugin, Player player, String content) {
+  public PlayerChatMessage(ServerAssistantPlugin plugin, Player player, String content) {
     super(plugin, content);
     this.player = player;
 

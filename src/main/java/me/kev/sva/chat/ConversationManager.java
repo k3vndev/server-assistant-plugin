@@ -1,8 +1,8 @@
 package me.kev.sva.chat;
 
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
+import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.assistant.AssistantManager;
 import me.kev.sva.chat.assistant.AssistantPrompts;
 import me.kev.sva.chat.assistant.AssistantResponse;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ConversationManager {
 
-  private final JavaPlugin plugin;
+  private final ServerAssistantPlugin plugin;
   private final List<ChatMessage> conversation = new ArrayList<>();
   private final AssistantManager assistantManager;
 
@@ -23,7 +23,7 @@ public class ConversationManager {
   private BukkitTask batchTask;
   private BukkitTask maxBatchTask;
 
-  public ConversationManager(JavaPlugin plugin) {
+  public ConversationManager(ServerAssistantPlugin plugin) {
     this.plugin = plugin;
     this.assistantManager = new AssistantManager(plugin, this);
 
@@ -31,6 +31,10 @@ public class ConversationManager {
     AssistantResponse initialAssistantResponse = AssistantPrompts.getInitialResponse(plugin);
     AssistantChatMessage initialAssistantChatMessage = new AssistantChatMessage(plugin, initialAssistantResponse.raw);
     conversation.add(initialAssistantChatMessage);
+  }
+
+  public AssistantManager getAssistantManager() {
+    return assistantManager;
   }
 
   public void shutdown() {

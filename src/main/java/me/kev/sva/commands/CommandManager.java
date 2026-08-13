@@ -8,17 +8,16 @@ import java.util.Locale;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
 
-import me.kev.sva.ServerAssistant;
+import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.utils.MessageSender;
 import net.kyori.adventure.text.Component;
 
 public class CommandManager implements TabExecutor {
-  private final JavaPlugin plugin;
+  private final ServerAssistantPlugin plugin;
 
-  public CommandManager(JavaPlugin plugin) {
+  public CommandManager(ServerAssistantPlugin plugin) {
     this.plugin = plugin;
   }
 
@@ -42,8 +41,8 @@ public class CommandManager implements TabExecutor {
     if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
       try {
         // Reload config and reinitialize plugin state
-        if (plugin instanceof ServerAssistant) {
-          ((ServerAssistant) plugin).reloadPlugin();
+        if (plugin instanceof ServerAssistantPlugin) {
+          ((ServerAssistantPlugin) plugin).reloadPlugin();
         } else {
           plugin.reloadConfig();
         }

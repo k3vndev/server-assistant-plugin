@@ -1,12 +1,12 @@
 package me.kev.sva.chat.message;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import me.kev.sva.ServerAssistantPlugin;
 
 public abstract class ChatMessage {
   public final String content;
-  protected final JavaPlugin plugin;
+  protected final ServerAssistantPlugin plugin;
 
-  public ChatMessage(JavaPlugin plugin, String content) {
+  public ChatMessage(ServerAssistantPlugin plugin, String content) {
     this.plugin = plugin;
     this.content = content;
   }

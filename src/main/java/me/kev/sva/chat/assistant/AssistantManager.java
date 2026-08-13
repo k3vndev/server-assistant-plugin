@@ -3,12 +3,11 @@ package me.kev.sva.chat.assistant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 
+import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.ConversationManager;
 import me.kev.sva.chat.message.AssistantChatMessage;
 import me.kev.sva.chat.message.BroadcastChatMessage;
@@ -17,12 +16,12 @@ import me.kev.sva.chat.message.PlayerChatMessage;
 import me.kev.sva.utils.MessageSender;
 
 public class AssistantManager {
-  private final JavaPlugin plugin;
+  private final ServerAssistantPlugin plugin;
   private final OpenAIClient client;
   private final ConversationManager conversationManager;
   private volatile boolean shutdown = false;
 
-  public AssistantManager(JavaPlugin plugin, ConversationManager conversationManager) {
+  public AssistantManager(ServerAssistantPlugin plugin, ConversationManager conversationManager) {
     this.plugin = plugin;
     this.conversationManager = conversationManager;
 
@@ -89,9 +88,15 @@ public class AssistantManager {
           if (text.isEmpty())
             return;
 
+          MessageSender.Success(text);
+
+          // Create new assistant message
           AssistantChatMessage assistantMessage = new AssistantChatMessage(plugin, text);
           conversationManager.addChatMessage(assistantMessage);
-          assistantMessage.response.broadcast();
+
+          // Broadcast messages and call tools
+          assistantMessage.response.broadcastMessages();
+          assistantMessage.response.callTools();
         })
         .exceptionally(error -> {
           if (!shutdown) {
@@ -125,6 +130,9 @@ public class AssistantManager {
     paramsBuilder.addSystemMessage("""
         Maximum assistant message length: %d characters
         """.formatted(maxAssistantMessageLength));
+
+    // Avilable tools prompt
+    paramsBuilder.addSystemMessage(AssistantPrompts.getAvailableTools(plugin));
   }
 
   private void appendConversationMessagesToBuilder(

@@ -10,7 +10,7 @@ import me.kev.sva.commands.CommandManager;
 import me.kev.sva.constants.Constants;
 import me.kev.sva.utils.MessageSender;
 
-public final class ServerAssistant extends JavaPlugin {
+public final class ServerAssistantPlugin extends JavaPlugin {
 
     private ConversationManager conversationManager;
     private ChatListener chatListener;
@@ -54,6 +54,10 @@ public final class ServerAssistant extends JavaPlugin {
         conversationManager = new ConversationManager(this);
         chatListener = new ChatListener(this, conversationManager);
         getServer().getPluginManager().registerEvents(chatListener, this);
+    }
+
+    public ConversationManager getConversationManager() {
+        return conversationManager;
     }
 
     /**
