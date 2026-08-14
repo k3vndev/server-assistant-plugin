@@ -108,13 +108,7 @@ request-triggers:
       player-advancement: true
 
       # Triggered when a player joins the server.
-      player-join: false
-
-      # Triggered when a player leaves the server.
-      player-quit: false
-
-      # Triggered when a player is kicked from the server.
-      player-kick: false
+      player-join-quit: false
 
 
   # Allows the assistant to receive a request after the server

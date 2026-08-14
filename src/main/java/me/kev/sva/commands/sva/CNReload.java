@@ -1,21 +1,21 @@
-package me.kev.sva.custom_commands.commands;
+package me.kev.sva.commands.sva;
 
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
 import me.kev.sva.ServerAssistantPlugin;
-import me.kev.sva.custom_commands.CustomCommand;
+import me.kev.sva.commands.CommandNode;
 import me.kev.sva.utils.MessageSender;
 
 /**
  * Handles the /sva reload command.
  */
-public class CustomCommandReload extends CustomCommand {
+public class CNReload extends CommandNode {
   private final ServerAssistantPlugin plugin;
 
-  public CustomCommandReload(CommandSender sender, ServerAssistantPlugin plugin) {
-    super(sender);
+  public CNReload(CommandSender sender, ServerAssistantPlugin plugin) {
+    super(sender, plugin);
     this.plugin = plugin;
   }
 
@@ -25,21 +25,10 @@ public class CustomCommandReload extends CustomCommand {
   }
 
   @Override
-  public boolean matches(String[] args) {
-    return args.length == 1 && args[0].equalsIgnoreCase(getName());
-  }
-
-  @Override
-  public boolean execute(String[] args) {
+  public boolean execute(List<String> args) {
     try {
-      if (plugin instanceof ServerAssistantPlugin) {
-        ((ServerAssistantPlugin) plugin).reloadPlugin();
-      } else {
-        plugin.reloadConfig();
-      }
-
+      plugin.reloadPlugin();
       MessageSender.Success("Plugin reloaded!");
-
     } catch (Exception e) {
       plugin.getLogger().severe(
           "Config reload failed: "
@@ -48,15 +37,9 @@ public class CustomCommandReload extends CustomCommand {
               + e.getMessage());
 
       e.printStackTrace();
-
       MessageSender.Error("Config reload failed. Check console.");
     }
 
     return true;
-  }
-
-  @Override
-  public List<String> getTabCompletions(String[] args) {
-    return List.of();
   }
 }

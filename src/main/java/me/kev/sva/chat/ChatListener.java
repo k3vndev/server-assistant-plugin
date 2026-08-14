@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -149,13 +148,39 @@ public class ChatListener implements Listener {
       return;
     }
 
-    Component message = event.deathMessage();
+    Player player = event.getPlayer();
 
-    if (message == null) {
-      return;
+    StringBuilder message = new StringBuilder();
+
+    message.append("[PLAYER JUST DIED!]\n");
+    message.append("Player: ").append(player.getName()).append("\n");
+    message.append("World: ").append(player.getWorld().getName()).append("\n");
+
+    message.append("Location: ")
+        .append(player.getLocation().getBlockX())
+        .append(", ")
+        .append(player.getLocation().getBlockY())
+        .append(", ")
+        .append(player.getLocation().getBlockZ())
+        .append("\n");
+
+    if (player.getKiller() != null) {
+      message.append("Killed by player: ")
+          .append(player.getKiller().getName())
+          .append("\n");
+    } else if (player.getLastDamageCause() != null) {
+      message.append("Last damage cause: ")
+          .append(player.getLastDamageCause().getCause().name())
+          .append("\n");
     }
 
-    queueGlobalEvent(plain(message));
+    if (event.deathMessage() != null) {
+      message.append("Death message: ")
+          .append(plain(event.deathMessage()))
+          .append("\n");
+    }
+
+    queueGlobalEvent(message.toString());
   }
 
   @EventHandler
@@ -175,7 +200,7 @@ public class ChatListener implements Listener {
 
   @EventHandler
   public void onPlayerJoin(PlayerJoinEvent event) {
-    if (!shouldProcessGlobalEvent("player-join")) {
+    if (!shouldProcessGlobalEvent("player-join-quit")) {
       return;
     }
 
@@ -190,26 +215,11 @@ public class ChatListener implements Listener {
 
   @EventHandler
   public void onPlayerQuit(PlayerQuitEvent event) {
-    if (!shouldProcessGlobalEvent("player-quit")) {
+    if (!shouldProcessGlobalEvent("player-join-quit")) {
       return;
     }
 
     Component message = event.quitMessage();
-
-    if (message == null) {
-      return;
-    }
-
-    queueGlobalEvent(plain(message));
-  }
-
-  @EventHandler
-  public void onPlayerKick(PlayerKickEvent event) {
-    if (!shouldProcessGlobalEvent("player-kick")) {
-      return;
-    }
-
-    Component message = event.leaveMessage();
 
     if (message == null) {
       return;
