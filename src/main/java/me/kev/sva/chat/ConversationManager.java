@@ -168,7 +168,7 @@ public class ConversationManager {
   }
 
   private long getMessageBatchDelayMs() {
-    return plugin.getConfig().getLong("message-batching.wait-time", 500);
+    return plugin.getConfig().getLong("message-batching.wait-time", 2000);
   }
 
   private long getMaxBatchWaitMs() {

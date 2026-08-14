@@ -155,7 +155,7 @@ message-batching:
   #
   # Higher values reduce API calls but make the assistant feel
   # less responsive.
-  wait-time: 1500
+  wait-time: 2000
 
   # Maximum amount of time, in milliseconds, a batch can remain
   # open regardless of new messages being received.

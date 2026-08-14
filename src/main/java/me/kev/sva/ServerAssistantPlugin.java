@@ -6,7 +6,7 @@ import org.bukkit.event.HandlerList;
 
 import me.kev.sva.chat.ChatListener;
 import me.kev.sva.chat.ConversationManager;
-import me.kev.sva.commands.CommandManager;
+import me.kev.sva.custom_commands.CustomCommandManager;
 import me.kev.sva.constants.Constants;
 import me.kev.sva.utils.MessageSender;
 
@@ -20,7 +20,7 @@ public final class ServerAssistantPlugin extends JavaPlugin {
         saveDefaultConfig();
 
         // Register command handler
-        CommandManager commandManager = new CommandManager(this);
+        CustomCommandManager commandManager = new CustomCommandManager(this);
         if (getCommand("sva") != null) {
             getCommand("sva").setExecutor(commandManager);
             getCommand("sva").setTabCompleter(commandManager);
