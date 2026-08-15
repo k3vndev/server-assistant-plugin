@@ -10,7 +10,8 @@ import org.yaml.snakeyaml.Yaml;
 import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.ConversationManager;
 import me.kev.sva.chat.message.BroadcastChatMessage;
-import me.kev.sva.chat.tools.all.WikiTool;
+import me.kev.sva.chat.tooling.ToolBase;
+import me.kev.sva.chat.tooling.tools.WikiTool;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
@@ -158,56 +159,45 @@ public class AssistantResponse {
   }
 
   /**
-   * Calls all tools the assistant used for this response.
+   * Executes all tools requested by the assistant and sends their results
+   * back into the conversation for the next AI request.
    */
   public void callTools() {
-    WikiTool wikiTool = new WikiTool(plugin);
-
-    StringBuilder toolResults = new StringBuilder();
     List<String> toolCalls = getToolCalls();
 
-    // Do not proceed if no tools were called
-    if (toolCalls.size() == 0) {
+    if (toolCalls.isEmpty()) {
       return;
     }
 
-    // Handle tool calling
-    for (String toolCall : toolCalls) {
-      String[] parts = toolCall.trim().split("\\s+", 2);
+    List<ToolBase> tools = List.of(
+        new WikiTool(plugin)
+    // Add new tools here.
+    );
 
-      if (parts.length == 0) {
+    StringBuilder toolResults = new StringBuilder();
+
+    for (String toolCall : toolCalls) {
+      ToolBase tool = tools.stream()
+          .filter(t -> t.check(toolCall))
+          .findFirst()
+          .orElse(null);
+
+      if (tool == null) {
         continue;
       }
 
-      String toolName = parts[0];
-
-      if (toolName.equalsIgnoreCase("wiki")) {
-        if (parts.length < 2 || parts[1].isBlank()) {
-          toolResults.append("""
-
-              [TOOL RESULT]
-              wiki: Missing required key.
-              """);
-          continue;
-        }
-
-        String key = parts[1].trim();
-        String result = wikiTool.getWiki(key);
-
-        toolResults.append("""
-
-            [TOOL RESULT: wiki %s]
-            %s
-            """.formatted(key, result));
-      }
+      toolResults.append(tool.perform(toolCall))
+          .append("\n");
     }
 
-    String toolResult = toolResults.toString();
-
-    // AI call with toolPrompt
+    // Add messages and call AI model
     ConversationManager conversationManager = plugin.getConversationManager();
-    conversationManager.addChatMessage(new BroadcastChatMessage(plugin, toolResult));
+
+    conversationManager.addChatMessage(
+        new BroadcastChatMessage(plugin, toolResults.toString()));
+
     AssistantManager assistantManager = conversationManager.getAssistantManager();
+
     assistantManager.sendAIRequest();
   }
 }

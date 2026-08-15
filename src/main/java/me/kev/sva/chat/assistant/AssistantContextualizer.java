@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 
 import me.kev.sva.ServerAssistantPlugin;
-import me.kev.sva.chat.tools.all.WikiTool;
+import me.kev.sva.chat.tooling.ToolBase;
+import me.kev.sva.chat.tooling.tools.WikiTool;
 
 public abstract class AssistantContextualizer {
   public static final String PRIMARY_SYSTEM_INSTRUCTIONS = """
@@ -151,39 +152,15 @@ public abstract class AssistantContextualizer {
     return initialResponse;
   }
 
-  // TODO: Update this to support configured custom tools
   public static String getAvailableTools(ServerAssistantPlugin plugin) {
     StringBuilder builder = new StringBuilder();
 
     builder.append("""
-
         [AVAILABLE TOOLS]
         You may use the following tools when you need information or need to
         perform an action that the available tools support.
 
         Tool calls must be returned in the "tool-calls" YAML list.
-
-        TOOL: wiki <key>
-        Description: Retrieves detailed information from a specific wiki section
-        configured by the server administrator.
-
-        Usage:
-        wiki <key>
-
-        The key must exactly match one of the keys listed in the WIKI INDEX below.
-        Do not invent, modify, or guess wiki keys.
-
-        Use the wiki when a player's question requires specific server
-        information that may be stored there. Do not call it unnecessarily
-        when you already have enough information to answer.
-
-        The wiki is the server's source of truth for its configured rules,
-        commands, economy, items, locations, mechanics, and other documented
-        information.
-
-        If the required information is not available in the wiki, do not
-        invent it. You may answer using other available context when appropriate,
-        but make it clear when you do not know something specific about the server.
 
         TOOL USAGE BEHAVIOR:
 
@@ -214,14 +191,15 @@ public abstract class AssistantContextualizer {
 
         Tool calls should be purposeful. Do not call tools unnecessarily or
         repeatedly when the available information is already sufficient.
-
-        WIKI INDEX:
         """);
 
-    WikiTool wikiTool = new WikiTool(plugin);
+    List<ToolBase> availableTools = List.of(
+        new WikiTool(plugin));
 
-    builder.append("\n")
-        .append(wikiTool.getIndex());
+    for (ToolBase tool : availableTools) {
+      builder.append("\n")
+          .append(tool.getUsage());
+    }
 
     builder.append("""
 

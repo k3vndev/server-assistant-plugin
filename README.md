@@ -44,19 +44,21 @@ This allows multiple messages and tool calls to be handled reliably.
 Server-specific information can be configured directly in `config.yml`.
 
 ```yaml
-advanced-context:
+tools:
   wiki:
-    commands:
-      description: Commands available to players.
-      content: |
-        /spawn
-        /home
-        /tpa <player>
+    activation: smart
+    pages:
+      commands:
+        description: Commands available to players.
+        content: |
+          /spawn
+          /home
+          /tpa <player>
 
-    economy:
-      description: Server economy and currency information.
-      content: |
-        16 emeralds = 1 currency item
+      economy:
+        description: Server economy and currency information.
+        content: |
+          16 emeralds = 1 currency item
 ```
 
 The assistant receives an index of available wiki sections and can request detailed information when necessary.
@@ -70,7 +72,7 @@ SVA has a modular tool system that allows the assistant to interact with the ser
 Planned and implemented tools include:
 
 * **Wiki** — Retrieve configured server information.
-* **Player Info** — Retrieve information about an online player.
+* **Player Data** — Retrieve information about an online player.
 * **Inventory** — Inspect a player's inventory when additional detail is needed.
 * **Mute** — Temporarily mute a player.
 * **Sound** — Play sounds from a curated list.
@@ -109,7 +111,6 @@ Examples include:
 * Player deaths
 * Player joins
 * Player quits
-* Player kicks
 * Advancements
 * Other events can be added through the modular event system.
 

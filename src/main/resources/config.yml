@@ -213,74 +213,132 @@ prompt: |
   for more detail.
 
 
-# ============================================================
-# ADVANCED CONTEXT
-# ============================================================
-
-# Advanced context contains additional knowledge that the
-# assistant can retrieve when necessary.
+# ----------------------------------------------------------
+# ASSISTANT TOOLS
+# ----------------------------------------------------------
+# Controls which tools the assistant can use and whether
+# administrator approval is required before using them.
 #
-# In lazy-mode, this information is NOT sent to the model
-# initially.
+# Available activation modes:
 #
-# Instead, the assistant receives a list of available data
-# entries and can request the entries it believes are relevant
-# to the player's question.
+#   smart
+#     The assistant may use the tool when it considers it
+#     useful for the current situation.
+#     The tool is only called when needed and is not executed
+#     automatically or repeatedly.
 #
-# This helps reduce token usage and avoids sending the entire
-# server configuration with every message.
+#   ask
+#     The assistant must request confirmation from an online
+#     administrator before using the tool.
+#     Useful for tools that can affect players or the server.
+#
+#   never
+#     The assistant cannot use the tool.
+#
+# If "enabled" is false, all tools are disabled regardless
+# of their individual activation mode.
+tools:
+  enabled: true
 
-advanced-context:
+  # --------------------------------------------------------
+  # PLAYER DATA
+  # --------------------------------------------------------
+  # Allows the assistant to retrieve information about an
+  # online player, such as their location, world, status,
+  # statistics, and other available data.
+  player-data:
+    activation: smart
 
-  # ----------------------------------------------------------
-  # LAZY LOADING
-  # ----------------------------------------------------------
-
-  # When true, advanced context is fetched only when needed.
+  # --------------------------------------------------------
+  # INVENTORY
+  # --------------------------------------------------------
+  # Allows the assistant to inspect an online player's
+  # inventory.
   #
-  # When false, all advanced context is provided to the
-  # assistant at the beginning of every conversation/request.
-  lazy-mode: true
+  # This is separate from player-data because inventory
+  # information can be considerably larger.
+  inventory:
+    activation: smart
 
-  # ----------------------------------------------------------
-  # (WIKI) DATA CHUNKS
-  # ----------------------------------------------------------
+  # --------------------------------------------------------
+  # MUTE
+  # --------------------------------------------------------
+  # Temporarily mutes a player.
+  #
+  # Recommended to keep this on "ask" so the assistant cannot
+  # independently punish players without administrator approval.
+  mute:
+    activation: ask
 
-  # Each entry represents an independent piece of server
+  # --------------------------------------------------------
+  # SOUND
+  # --------------------------------------------------------
+  # Plays a sound from the assistant's curated sound list.
+  sound:
+    activation: smart
+
+  # --------------------------------------------------------
+  # LIGHTNING
+  # --------------------------------------------------------
+  # Creates a visual and audio lightning effect.
+  #
+  # This effect does not cause damage, set fire, or otherwise
+  # affect the world.
+  lightning:
+    activation: smart
+
+  # --------------------------------------------------------
+  # SCHEDULE
+  # --------------------------------------------------------
+  # Allows the assistant to schedule a future action.
+  #
+  # For example, the assistant can schedule itself to send
+  # a follow-up message after helping a player.
+  schedule:
+    activation: smart
+
+  # --------------------------------------------------------
+  # WIKI (ADVANCED CONTEXT)
+  # --------------------------------------------------------
+  # Provides the assistant with configurable server-specific
   # knowledge.
   #
-  # The assistant receives the NAME and DESCRIPTION of each
-  # available entry and can request the full content when
-  # necessary.
+  # The assistant receives an index containing each page's
+  # name and description. It can request the full contents of
+  # a relevant page using:
   #
-  # Use descriptive, declarative names so the assistant can
-  # easily determine which entry is relevant.
+  #   wiki <page>
   #
-  # The model then receives the contents of that data chunk
-  # before generating its final response.
+  # Page names are completely configurable. You may delete the default ones if you want.
+  # New pages must have description and content fields as shown below:
   wiki:
-    commands:
-      description: Commands available on the server.
-      content: |
-        /spawn
-        Teleports the player to the server spawn.
+    activation: smart
 
-        /home
-        Teleports the player to their personal home.
+    pages:
+      commands:
+        description: Commands available on the server.
+        content: |
+          /spawn
+          Teleports the player to the server spawn.
 
-        /sethome
-        Sets the player's current location as their home.
+          /home
+          Teleports the player to their personal home.
 
-        /tpa <player>
-        Sends a teleport request to another player.
-    server-rules:
-      description: Rules that players must follow while playing on the server.
-      content: |
-        1. No cheating or hacked clients.
-        2. No exploiting bugs for personal advantage.
-        3. Do not spam the chat.
-        4. Do not intentionally harass other players.
-        5. Follow staff instructions when necessary.
+          /sethome
+          Sets the player's current location as their home.
+
+          /tpa <player>
+          Sends a teleport request to another player.
+
+      server-rules:
+        description: Rules that players must follow while playing on the server.
+        content: |
+          1. No cheating or hacked clients.
+          2. No exploiting bugs for personal advantage.
+          3. Do not spam the chat.
+          4. Do not intentionally harass other players.
+          5. Follow staff instructions when necessary.
+
 
 # ============================================================
 # CHAT
