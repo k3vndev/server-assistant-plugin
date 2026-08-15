@@ -23,7 +23,8 @@ public class CNSva extends CommandNode {
   public List<CommandNode> getSubCommands() {
     return List.of(
         new CNListener(sender, plugin),
-        new CNReload(sender, plugin));
+        new CNReload(sender, plugin),
+        new CNTrigger(sender, plugin));
   }
 
   @Override
