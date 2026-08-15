@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 
 import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.tooling.ToolBase;
-import me.kev.sva.chat.tooling.tools.WikiTool;
 
 public abstract class AssistantContextualizer {
   public static final String PRIMARY_SYSTEM_INSTRUCTIONS = """
@@ -137,9 +136,11 @@ public abstract class AssistantContextualizer {
     return Bukkit.getOnlinePlayers().stream()
         .map(player -> {
           String result = player.getName();
-          if (player.isOp()) {
+
+          if (player.isOp() || player.hasPermission("sva.admin")) {
             result += " (ADMIN)";
           }
+
           return result;
         })
         .sorted()
@@ -193,8 +194,7 @@ public abstract class AssistantContextualizer {
         repeatedly when the available information is already sufficient.
         """);
 
-    List<ToolBase> availableTools = List.of(
-        new WikiTool(plugin));
+    List<ToolBase> availableTools = plugin.getToolManager().getAvailableTools();
 
     for (ToolBase tool : availableTools) {
       builder.append("\n")

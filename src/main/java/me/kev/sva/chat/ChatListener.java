@@ -38,6 +38,7 @@ public class ChatListener implements Listener {
         .serialize(event.message());
 
     if (!shouldProcessPlayerMessage(message)) {
+      plugin.getConversationManager().addChatMessage(new PlayerChatMessage(plugin, player, message));
       return;
     }
 

@@ -267,6 +267,9 @@ tools:
   #
   # Recommended to keep this on "ask" so the assistant cannot
   # independently punish players without administrator approval.
+  #
+  # Internally executes "/mute PlayerName" command, so it needs a plugin
+  # like EssentialsX that includes it.
   mute:
     activation: ask
 
@@ -276,6 +279,20 @@ tools:
   # Plays a sound from the assistant's curated sound list.
   sound:
     activation: smart
+
+    # Define sounds by adding more key-value pairs
+    # keys are shown to the model, while the values are Bukkit sounds used internally.
+    sounds:
+      creeper: ENTITY_CREEPER_PRIMED
+      explosion: ENTITY_GENERIC_EXPLODE
+      anvil: BLOCK_ANVIL_LAND
+      level-up: ENTITY_PLAYER_LEVELUP
+      villager: ENTITY_VILLAGER_AMBIENT
+      enderman: ENTITY_ENDERMAN_SCREAM
+      ghast: ENTITY_GHAST_SCREAM
+      lightning: ENTITY_LIGHTNING_BOLT_THUNDER
+      goat: ENTITY_GOAT_SCREAMING_AMBIENT
+      raid-horn: EVENT_RAID_HORN
 
   # --------------------------------------------------------
   # LIGHTNING
@@ -294,6 +311,8 @@ tools:
   #
   # For example, the assistant can schedule itself to send
   # a follow-up message after helping a player.
+  #
+  # ⚠️ NOT YET IMPLEMENTED ⚠️
   schedule:
     activation: smart
 

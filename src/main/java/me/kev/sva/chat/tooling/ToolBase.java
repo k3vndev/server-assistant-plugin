@@ -1,6 +1,7 @@
 package me.kev.sva.chat.tooling;
 
 import java.util.List;
+import java.util.Locale;
 
 import me.kev.sva.ServerAssistantPlugin;
 
@@ -101,11 +102,61 @@ public abstract class ToolBase {
     return """
         [TOOL USAGE (%s)]
         %s
+
+        %s
         [END TOOL USAGE (%s)]
         """.formatted(
         getCommand(),
         getUsageDescription(),
+        getActivationUsage(),
         getCommand());
+  }
+
+  /**
+   * Returns instructions describing how this tool may be activated
+   * according to its configuration.
+   */
+  public String getActivationUsage() {
+    String path = "tools." + getCommand() + ".activation";
+
+    String activation = plugin.getConfig()
+        .getString(path, "never")
+        .toUpperCase(Locale.ROOT);
+
+    return switch (activation) {
+      case "SMART" -> """
+          Tool Usage Mode: SMART
+          Use this tool when it is appropriate and useful.
+          """;
+
+      case "ASK" -> """
+          Tool Usage Mode: ASK
+          Ask an online server administrator for permission before using this tool.
+          """;
+
+      case "NEVER" -> """
+          Tool Usage Mode: NEVER
+          This tool is currently unavailable and must not be used.
+          """;
+
+      default -> """
+          Tool Usage Mode: NEVER
+          This tool has an invalid activation mode and must not be used.
+          """;
+    };
+  }
+
+  public boolean canBeUsed() {
+    if (!plugin.getConfig().getBoolean("tools.enabled", true)) {
+      return false;
+    }
+
+    String activation = plugin.getConfig()
+        .getString(
+            "tools." + getCommand() + ".activation",
+            "never");
+
+    return !activation.equalsIgnoreCase("never");
   }
 
   /**

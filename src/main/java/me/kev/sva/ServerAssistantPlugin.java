@@ -6,6 +6,7 @@ import org.bukkit.event.HandlerList;
 
 import me.kev.sva.chat.ChatListener;
 import me.kev.sva.chat.ConversationManager;
+import me.kev.sva.chat.tooling.ToolManager;
 import me.kev.sva.commands.CommandNodesManager;
 import me.kev.sva.constants.Constants;
 import me.kev.sva.utils.MessageSender;
@@ -14,6 +15,7 @@ public final class ServerAssistantPlugin extends JavaPlugin {
 
     private ConversationManager conversationManager;
     private ChatListener chatListener;
+    private ToolManager toolManager;
 
     @Override
     public void onEnable() {
@@ -53,11 +55,16 @@ public final class ServerAssistantPlugin extends JavaPlugin {
         // Create new conversation manager (reads updated config) and register listener
         conversationManager = new ConversationManager(this);
         chatListener = new ChatListener(this, conversationManager);
+        toolManager = new ToolManager(this);
         getServer().getPluginManager().registerEvents(chatListener, this);
     }
 
     public ConversationManager getConversationManager() {
         return conversationManager;
+    }
+
+    public ToolManager getToolManager() {
+        return toolManager;
     }
 
     /**

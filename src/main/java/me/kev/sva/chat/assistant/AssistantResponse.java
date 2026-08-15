@@ -11,7 +11,7 @@ import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.chat.ConversationManager;
 import me.kev.sva.chat.message.BroadcastChatMessage;
 import me.kev.sva.chat.tooling.ToolBase;
-import me.kev.sva.chat.tooling.tools.WikiTool;
+import me.kev.sva.utils.MessageSender;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
@@ -169,10 +169,7 @@ public class AssistantResponse {
       return;
     }
 
-    List<ToolBase> tools = List.of(
-        new WikiTool(plugin)
-    // Add new tools here.
-    );
+    List<ToolBase> tools = plugin.getToolManager().getAvailableTools();
 
     StringBuilder toolResults = new StringBuilder();
 
@@ -186,7 +183,11 @@ public class AssistantResponse {
         continue;
       }
 
-      toolResults.append(tool.perform(toolCall))
+      String toolResult = tool.perform(toolCall);
+      MessageSender.Dev(toolResult);
+
+      toolResults
+          .append(toolResult)
           .append("\n");
     }
 
