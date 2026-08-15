@@ -28,7 +28,7 @@ public class CNReload extends CommandNode {
   public boolean execute(List<String> args) {
     try {
       plugin.reloadPlugin();
-      MessageSender.Success("Plugin reloaded!");
+      MessageSender.Success(sender, "Plugin reloaded!");
     } catch (Exception e) {
       plugin.getLogger().severe(
           "Config reload failed: "
@@ -37,7 +37,7 @@ public class CNReload extends CommandNode {
               + e.getMessage());
 
       e.printStackTrace();
-      MessageSender.Error("Config reload failed. Check console.");
+      MessageSender.Error(sender, "Config reload failed. Check console.");
     }
 
     return true;

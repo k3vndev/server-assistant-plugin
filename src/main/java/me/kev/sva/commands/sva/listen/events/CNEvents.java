@@ -1,4 +1,4 @@
-package me.kev.sva.commands.sva.listen;
+package me.kev.sva.commands.sva.listen.events;
 
 import java.util.List;
 
@@ -7,24 +7,23 @@ import org.bukkit.command.CommandSender;
 import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.commands.CommandNode;
 
-/**
- * Handles the /sva listen command with support for multiple subcommands.
- * Structure: /sva listen <subcommand>
- */
-public class CNListen extends CommandNode {
-  public CNListen(CommandSender sender, ServerAssistantPlugin plugin) {
+public class CNEvents extends CommandNode {
+
+  public CNEvents(CommandSender sender, ServerAssistantPlugin plugin) {
     super(sender, plugin);
   }
 
   @Override
   public String getName() {
-    return "listen";
+    return "events";
   }
 
   @Override
   public List<CommandNode> getSubCommands() {
     return List.of(
-        new CNPlayerChat(sender, plugin));
+        new EventsCommandNode(sender, plugin, "player-death", "death"),
+        new EventsCommandNode(sender, plugin, "player-advancement", "advancement"),
+        new EventsCommandNode(sender, plugin, "player-join-quit", "joinquit"));
   }
 
   @Override

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import me.kev.sva.ServerAssistantPlugin;
 import me.kev.sva.commands.CommandNode;
-import me.kev.sva.commands.sva.listen.CNListen;
+import me.kev.sva.commands.sva.listen.CNListener;
 
 public class CNSva extends CommandNode {
 
@@ -22,7 +22,7 @@ public class CNSva extends CommandNode {
   @Override
   public List<CommandNode> getSubCommands() {
     return List.of(
-        new CNListen(sender, plugin),
+        new CNListener(sender, plugin),
         new CNReload(sender, plugin));
   }
 

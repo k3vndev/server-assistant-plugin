@@ -45,12 +45,14 @@ public class ChatListener implements Listener {
         new PlayerChatMessage(plugin, player, message));
   }
 
-  private boolean shouldProcessPlayerMessage(String message) {
-    FileConfiguration config = plugin.getConfig();
-
-    String mode = config.getString(
+  String getCurrentChatMode() {
+    return plugin.getConfig().getString(
         "request-triggers.player-messages.mode",
         "mention");
+  }
+
+  private boolean shouldProcessPlayerMessage(String message) {
+    String mode = getCurrentChatMode();
 
     return switch (mode.toLowerCase(Locale.ROOT)) {
       case "always" -> true;
@@ -82,6 +84,11 @@ public class ChatListener implements Listener {
         .anyMatch(lowerMessage::contains);
   }
 
+  private void resetSmartConversationTime() {
+    long now = System.currentTimeMillis();
+    smartConversationLastMessage = now;
+  }
+
   private boolean shouldProcessSmartMessage(String message) {
     long now = System.currentTimeMillis();
 
@@ -93,7 +100,7 @@ public class ChatListener implements Listener {
 
     // A mention starts (or reopens) the conversation.
     if (containsMention(message)) {
-      smartConversationLastMessage = now;
+      resetSmartConversationTime();
       return true;
     }
 
@@ -131,6 +138,10 @@ public class ChatListener implements Listener {
   private void queueGlobalEvent(String message) {
     if (message == null || message.isBlank()) {
       return;
+    }
+
+    if (getCurrentChatMode() == "smart") {
+      resetSmartConversationTime();
     }
 
     conversationManager.queueNewMessage(

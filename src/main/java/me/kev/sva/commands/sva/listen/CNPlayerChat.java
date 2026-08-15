@@ -10,7 +10,7 @@ import me.kev.sva.utils.MessageSender;
 
 public class CNPlayerChat extends CommandNode {
 
-  protected CNPlayerChat(CommandSender sender, ServerAssistantPlugin plugin) {
+  public CNPlayerChat(CommandSender sender, ServerAssistantPlugin plugin) {
     super(sender, plugin);
   }
 
@@ -20,7 +20,7 @@ public class CNPlayerChat extends CommandNode {
   }
 
   @Override
-  public List<String> getCommandOptions() {
+  public List<String> getOptions() {
     return List.of("always", "mention", "smart", "disabled");
   }
 
@@ -31,8 +31,13 @@ public class CNPlayerChat extends CommandNode {
       return false;
     }
 
+    if (args.size() > 1) {
+      throwExtraArgumentsError();
+      return false;
+    }
+
     String mode = args.getFirst();
-    List<String> modes = getCommandOptions();
+    List<String> modes = getOptions();
 
     if (modes.contains(mode)) {
       plugin.getConfig().set(
@@ -42,12 +47,12 @@ public class CNPlayerChat extends CommandNode {
       plugin.saveConfig();
 
       MessageSender.Success(
-          "Player message mode set to: " + mode);
+          sender,
+          "Player message listener mode set to: " + mode);
       return true;
     }
 
-    MessageSender.Error(
-        "Invalid mode. Use: " + String.join(", ", modes) + ".");
+    throwInvalidArgumentError();
     return false;
   }
 }

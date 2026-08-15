@@ -41,15 +41,16 @@ public abstract class CommandNode {
   /**
    * Gets the literal options available as arguments for this command.
    */
-  public List<String> getCommandOptions() {
+  public List<String> getOptions() {
     return List.of();
   }
 
   protected boolean executeSubcommands(List<String> args) {
     for (CommandNode command : getSubCommands()) {
       if (command.matches(args)) {
-        args.removeLast();
-        return command.execute(args);
+        args.removeFirst();
+        command.execute(args);
+        return true;
       }
     }
     return false;
@@ -63,7 +64,6 @@ public abstract class CommandNode {
       return false;
 
     String first = args.getFirst();
-    MessageSender.Success("Checking match for: " + first);
     return first.equalsIgnoreCase(getName());
   }
 
@@ -98,7 +98,7 @@ public abstract class CommandNode {
 
     // One argument remaining: complete it against this node's
     // subcommands and command options.
-    return getCompletions(args.get(0));
+    return getCompletions(args.getFirst());
   }
 
   /**
@@ -111,7 +111,7 @@ public abstract class CommandNode {
       completions.add(subCommand.getName());
     }
 
-    completions.addAll(getCommandOptions());
+    completions.addAll(getOptions());
 
     List<String> matches = new ArrayList<>();
 
@@ -134,6 +134,52 @@ public abstract class CommandNode {
   }
 
   protected void throwMissingArgumentsError() {
-    MessageSender.Error("Missing arguments!");
+    MessageSender.Error(sender, "Missing arguments for command: " + getName());
+    printValidArgumentsList();
+  }
+
+  protected void throwInvalidArgumentError() {
+    MessageSender.Error(sender, "Invalid argument for command: " + getName());
+    printValidArgumentsList();
+  }
+
+  protected void throwExtraArgumentsError() {
+    MessageSender.Error(sender, "Extra arguments provided for command: " + getName());
+    printValidArgumentsList();
+  }
+
+  /**
+   * Prints the valid subcommands and options for this command.
+   */
+  protected void printValidArgumentsList() {
+    List<CommandNode> subCommands = getSubCommands();
+    List<String> options = getOptions();
+
+    if (subCommands.isEmpty() && options.isEmpty()) {
+      MessageSender.Error(sender, "This command has no valid arguments.");
+      return;
+    }
+
+    StringBuilder message = new StringBuilder();
+    message.append("Valid arguments for ").append(getName()).append(": ");
+
+    // Add subcommands
+    if (!subCommands.isEmpty()) {
+      List<String> subCommandNames = new ArrayList<>();
+      for (CommandNode subCommand : subCommands) {
+        subCommandNames.add(subCommand.getName());
+      }
+      message.append("[").append(String.join(" | ", subCommandNames)).append("]");
+    }
+
+    // Add options
+    if (!options.isEmpty()) {
+      if (!subCommands.isEmpty()) {
+        message.append(" or ");
+      }
+      message.append("[").append(String.join(" | ", options)).append("]");
+    }
+
+    MessageSender.Error(sender, message.toString());
   }
 }

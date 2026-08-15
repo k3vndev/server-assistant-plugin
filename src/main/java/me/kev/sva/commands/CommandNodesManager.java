@@ -52,6 +52,7 @@ public class CommandNodesManager implements TabExecutor {
       return Collections.emptyList();
     }
 
-    return Collections.emptyList();
+    List<String> remainingArgs = new ArrayList<>(List.of(args));
+    return new CNSva(sender, plugin).getTabCompletions(remainingArgs);
   }
 }

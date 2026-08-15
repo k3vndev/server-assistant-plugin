@@ -116,11 +116,15 @@ def main() -> None:
     )
     print(f"Found generated jar: {generated_jar}")
 
-    plugin_jar = find_plugin_jar(PLUGINS_DIR, generated_jar.name, artifact_id)
-    print(f"Found plugin jar to replace: {plugin_jar}")
+    try:
+        plugin_jar = find_plugin_jar(PLUGINS_DIR, generated_jar.name, artifact_id)
+        print(f"Found plugin jar to replace: {plugin_jar}")
+    except FileNotFoundError:
+        print("No existing jar found, copying new jar to plugins folder")
+        plugin_jar = PLUGINS_DIR / generated_jar.name
 
     shutil.copy2(generated_jar, plugin_jar)
-    print(f"Replaced plugin jar with built jar: {plugin_jar}")
+    print(f"Copied jar to: {plugin_jar}")
 
     if RESET_CONFIG:
         remove_config_folder(PLUGINS_DIR, SERVER_ASSISTANT_CONFIG_DIR_NAME)
